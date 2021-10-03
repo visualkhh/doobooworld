@@ -34,7 +34,7 @@ export class WorldManager implements LifeCycle {
     }
 
     getWorld(): Promise<World> {
-        return this.apiService.get('/datas/map.json').then()
+        return this.apiService.get('/datas/world.json').then()
     }
 
 }

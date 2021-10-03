@@ -6,7 +6,7 @@ import { environment } from 'environments/environment';
 @Sim()
 export class ApiService {
 
-    public get(url: string) {
+    public get<T>(url: string): Promise<T> {
         return fetch(environment.apiHostUrl + url).then((response) => response.json());
         // const p = this.alertService.showProgress(title);
         // p.open();

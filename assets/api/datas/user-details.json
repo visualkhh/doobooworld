@@ -1,0 +1,13 @@
+{
+  "name": "khh",
+  "use": true,
+  "world": {
+    "center": {
+      "x": 250,
+      "y": 250
+    },
+    "tile": {
+      "size": 10
+    }
+  }
+}
