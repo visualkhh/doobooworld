@@ -4,6 +4,8 @@ html, body {
     width: 100vw;
     height: 100vh;
 }
-.canvas {
-    /*border: 1px black solid;*/
+.canvas-container {
+    width: 50vw;
+    height: 50vh;
+    border: 1px black solid;
 }

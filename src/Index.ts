@@ -5,48 +5,70 @@ import { Component } from 'simple-boot-front/decorators/Component';
 import template from './index.html'
 import style from './index.css'
 import { WorldManager } from 'manasgers/WorldManager';
-import { World } from 'models/models';
+import { UserDetails, World } from 'models/models';
 import { UserService } from 'services/UserService';
 import { LifeCycle } from 'simple-boot-core/cycles/LifeCycle';
 import { DomRenderProxy } from 'dom-render/DomRenderProxy';
+import { from } from 'rxjs';
+import { Drawble } from 'draws/Drawble';
+import { Tile } from 'objects/Tile';
+import { Position } from 'domains/Position';
+import { CanvasSet } from 'domains/CanvasSet';
 
 @Sim()
 @Component({template, styles: [style]})
-export class Index implements LifeCycle {
-    public data: {canvas?: HTMLCanvasElement} = DomRenderProxy.final({});
+export class Index extends Drawble implements LifeCycle {
+    canvasSet?: CanvasSet;
+    canvasContainer?: HTMLDivElement;
+
+    objects: Drawble[] = [];
+
     public world?: World;
+    private userDetails?: UserDetails;
+    private context?: CanvasRenderingContext2D | null;
     constructor(public worldManager: WorldManager, public userService: UserService) {
-        this.worldManager.getWorld().then(it => this.world = it);
-        this.userService.subject.subscribe(it => {
-            console.log(it);
-        })
+        super();
+        from(this.worldManager.getWorld()).subscribe(it => this.world = it);
     }
 
     onCreate(): void {
         window.addEventListener('resize', ev => {
-            if (this.data.canvas) {
-                let target = ev.target as Window;
-                this.data.canvas.width = target.innerWidth;
-                this.data.canvas.height = target.innerHeight;
+            if (this.canvasSet && this.canvasContainer) {
+                this.canvasSet.width = this.canvasContainer.clientWidth;
+                this.canvasSet.height = this.canvasContainer.clientHeight;
             }
         });
-        window.dispatchEvent(new Event('resize'));
     }
 
     onInitCanvas(canvas: HTMLCanvasElement) {
-        this.data.canvas = canvas;
+        this.canvasSet = new CanvasSet(canvas);
+        this.userService.subject.subscribe(it => {
+            this.userDetails = it;
+            this.objects.push(new Tile(this.canvasSet!, new Position(this.userDetails.world.center.x, this.userDetails.world.center.y), this.userDetails!.world.tile.size));
+        })
+        window.dispatchEvent(new Event('resize'));
         this.worldManager.drawInterval(this.onDraw, this);
+    }
+
+    onInitCanvasContainer(container: HTMLDivElement) {
+        this.canvasContainer = container;
     }
 
 
     onDraw() {
-        if (this.world && this.data.canvas) {
-            let context = this.data.canvas.getContext('2d')!;
-            context.fillRect(25, 25, 100, 100);
+        if (this.world && this.canvasSet && this.userDetails) {
+            this.canvasSet.clearCanvas();
+            // const context = this.canvasSet.clearResetCanvas();
+            // context.strokeRect(25, 25, 100, 100);
+
+            this.objects.forEach(it => it.onDraw())
+            // context.fillRect(25, 25, 100, 100);
         }
         // console.log('draw')
     }
 
 }
 
-new SimpleBootFront(Index, new SimFrontOption(window)).run();
+const simpleBootFront = new SimpleBootFront(Index, new SimFrontOption(window));
+simpleBootFront.domRendoerExcludeProxy.push(CanvasRenderingContext2D)
+simpleBootFront.run();
