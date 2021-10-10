@@ -1,7 +1,5 @@
 import { Sim } from 'simple-boot-core/decorators/SimDecorator';
-import { LifeCycle } from 'simple-boot-core/cycles/LifeCycle';
-import { DomRenderProxy } from 'dom-render/DomRenderProxy';
-import { environment } from 'environments/environment';
+import { environment } from '@environments/environment';
 
 @Sim()
 export class ApiService {

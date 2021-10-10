@@ -2,9 +2,10 @@ export class CanvasSet {
     constructor(public canvas: HTMLCanvasElement, public context: CanvasRenderingContext2D = canvas.getContext('2d')!) {
     }
 
-    clearResetCanvas() {
+    resetClearCanvas() {
+        let canvasRenderingContext2D = this.resetContext();
         this.clearCanvas();
-        return this.resetContext();
+        return canvasRenderingContext2D;
     }
     clearCanvas() {
         this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);

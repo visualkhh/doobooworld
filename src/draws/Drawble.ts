@@ -1,6 +1,5 @@
-export abstract class Drawble {
+import { CanvasSet } from 'domains/CanvasSet';
 
-
-
-    abstract onDraw(): void;
+export interface Drawble {
+    onDraw(canvasSet?: CanvasSet): void;
 }
