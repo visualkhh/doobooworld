@@ -7,41 +7,63 @@ import style from './index.css'
 import { WorldManager } from 'manasgers/WorldManager';
 import { SimstanceManager } from 'simple-boot-core/simstance/SimstanceManager';
 import { UserService } from 'services/UserService';
-import { LifeCycle } from 'simple-boot-core/cycles/LifeCycle';
 import { DomRenderProxy } from 'dom-render/DomRenderProxy';
+import { OnInitRender } from 'dom-render/lifecycle/OnInitRender';
 import { BehaviorSubject, filter, from, Subject } from 'rxjs';
 import { Drawble } from 'draws/Drawble';
 import { Tile } from 'objects/Tile';
 import { Position } from 'domains/Position';
 import { CanvasSet } from 'domains/CanvasSet';
+import { OnInit } from 'simple-boot-front/lifecycle/OnInit';
 
 @Sim()
 @Component({template, styles: [style]})
-export class Index implements Drawble, LifeCycle {
+export class Index implements Drawble, OnInit, OnInitRender {
     canvasSet?: CanvasSet;
     canvasContainer?: HTMLDivElement;
     constructor(public worldManager: WorldManager, public simstanceManager: SimstanceManager, public tile: Tile) {
     }
 
-    onCreate(): void {
+    onInitRender(): void {
+
+        //print hello
+
+
+
+        console.log('----')
+    }
+
+    onInit(): void {
+        console.log('--22--')
         window.addEventListener('resize', ev => {
-            if (this.canvasSet && this.canvasContainer) {
-                this.canvasSet.width = this.canvasContainer.clientWidth;
-                this.canvasSet.height = this.canvasContainer.clientHeight;
-            }
+            this.resizeCanvase();
         });
     }
 
     onInitCanvas(canvas: HTMLCanvasElement) {
+        console.log('-????')
         this.canvasSet = new CanvasSet(canvas);
-        window.dispatchEvent(new Event('resize'));
-        this.worldManager.drawInterval(this.onDraw, this);
+        this.resizeCanvase();
+        this.onDraw();
+        this.worldManager.drawInterval({time: this.onTime.bind(this), draw: this.onDraw.bind(this)});
+    }
+
+    resizeCanvase() {
+        if (this.canvasSet && this.canvasContainer) {
+            this.canvasSet.width = this.canvasContainer.clientWidth;
+            this.canvasSet.height = this.canvasContainer.clientHeight;
+        }
     }
 
     onInitCanvasContainer(container: HTMLDivElement) {
         this.canvasContainer = container;
     }
 
+
+    onTime(timestemp: number) {
+        this.tile.onTime(timestemp);
+        // console.log('---time stemp--?', timestemp);
+    }
 
     onDraw() {
         if (this.canvasSet) {

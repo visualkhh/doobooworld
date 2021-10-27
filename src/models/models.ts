@@ -1,12 +1,13 @@
-export interface World {
+export type World = {
     width: number,
     height: number,
+    fps: number,
     object: any[]
 }
 
 
 
-export interface UserDetails {
+export type UserDetails = {
     name: string;
     use: boolean;
     world: {
@@ -14,8 +15,8 @@ export interface UserDetails {
             x: number,
             y: number
         },
-        tile: {
-            size: number;
-        }
+        zoom: number;
+        // tile: {
+        // }
     }
 }

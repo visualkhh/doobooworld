@@ -1,6 +1,7 @@
 {
-  "width": 500,
-  "height": 500,
+  "width": 1000,
+  "height": 1000,
+  "fps": 60,
   "objects": [
 
   ]

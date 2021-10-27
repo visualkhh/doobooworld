@@ -21,10 +21,12 @@
     }
   },
   "scripts": {
-    "serve": "node bin/http-server --path ./dist --port 4200",
+    "serve": "sbf serve --path ./dist --port 4200",
+    "serve:watch": "sbf serve --path ./dist --port 4200 --watch",
+    "serve:watch:all": "sbf serve --path ./dist --port 4200 --watch --bundle rollup",
     "serve:8080": "node bin/http-server --path ./dist --port 4200 --proxy http://localhost:8080",
     "serve:8085": "node bin/http-server --path ./dist --port 4200 --proxy http://localhost:8085",
-    "start": "rollup -c && node bin/http-server --path ./dist --port 4200",
+    "start": "rollup -c && sbf --path ./dist --port 4200",
     "bundle": "rollup -c ",
     "bundle:watch": "rollup -c -w "
   },
@@ -54,12 +56,13 @@
     "rollup-plugin-sourcemaps": "^0.6.3",
     "rollup-plugin-typescript2": "^0.30.0",
     "rollup-watch": "^4.3.1",
+    "simple-boot-front-cli": "^1.0.6",
     "supertest": "^6.1.3",
     "ts-jest": "^26.5.4",
     "typescript": "^4.3.5"
   },
   "dependencies": {
     "rxjs": "^7.3.1",
-    "simple-boot-front": "^1.0.81"
+    "simple-boot-front": "^1.0.98"
   }
 }

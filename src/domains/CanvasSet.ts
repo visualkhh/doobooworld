@@ -21,6 +21,14 @@ export class CanvasSet {
         return this.context;
     }
 
+    get width() {
+        return this.canvas.width;
+    }
+
+    get height() {
+        return this.canvas.height;
+    }
+
     set width(width: number) {
         this.canvas.width = width;
     }

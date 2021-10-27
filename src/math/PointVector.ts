@@ -69,6 +69,7 @@ export class PointVector extends Point {
             this.y *= v;
             this.z *= v;
         }
+        return this;
     }
 
     public div(v: number | PointVector) {
@@ -81,6 +82,7 @@ export class PointVector extends Point {
             this.y /= v;
             this.z /= v;
         }
+        return this;
     }
 
     public static div(v: PointVector, d: number): PointVector {
