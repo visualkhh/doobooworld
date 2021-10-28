@@ -16,32 +16,25 @@ import { Position } from 'domains/Position';
 import { CanvasSet } from 'domains/CanvasSet';
 import { OnInit } from 'simple-boot-front/lifecycle/OnInit';
 import { UserDetails, World } from 'models/models';
+import { Debug } from 'objects/Debug';
 
 @Sim()
 @Component({template, styles: [style]})
-export class Index implements Drawble, OnInit, OnInitRender {
+export class Index implements Drawble, OnInit {
     canvasSet?: CanvasSet;
     canvasContainer?: HTMLDivElement;
     private worldData?: World;
     private userData?: UserDetails;
     private tile?: Tile;
+    private debug = new Debug();
     constructor(public worldManager: WorldManager, public userService: UserService, public simstanceManager: SimstanceManager) {
         // worldManager.subject.subscribe(it => this.worldData = it);
         // userService.subject.subscribe(it => this.userData = it);
-        zip(worldManager.subject, userService.subject).subscribe(it => {
+        zip(this.worldManager.subject, this.userService.subject.pipe(filter(it => it.use))).subscribe(it => {
             this.worldData = it[0]
             this.userData = it[1];
             this.tile = new Tile(this.worldData, this.userData);
         })
-    }
-
-    onInitRender(): void {
-
-        //print hello
-
-
-
-        console.log('----')
     }
 
     onInit(): void {
@@ -55,8 +48,9 @@ export class Index implements Drawble, OnInit, OnInitRender {
         console.log('-????')
         this.canvasSet = new CanvasSet(canvas);
         this.resizeCanvase();
+
         this.onDraw();
-        this.worldManager.drawInterval({time: this.onTime.bind(this), draw: this.onDraw.bind(this)});
+        this.worldManager.drawInterval({animationFrame: this.animationFrame.bind(this), draw: this.onDraw.bind(this)});
     }
 
     resizeCanvase() {
@@ -71,8 +65,8 @@ export class Index implements Drawble, OnInit, OnInitRender {
     }
 
 
-    onTime(timestemp: number) {
-        this.tile?.onTime(timestemp);
+    animationFrame(timestemp: number) {
+        this.tile?.animationFrame(timestemp);
         // console.log('---time stemp--?', timestemp);
     }
 
@@ -88,6 +82,9 @@ export class Index implements Drawble, OnInit, OnInitRender {
             }
             // this.objects.forEach(it => it.onDraw())
             // context.fillRect(25, 25, 100, 100);
+
+            this.debug
+            this.debug.onDraw(this.canvasSet);
         }
         // console.log('draw')
     }

@@ -6,12 +6,12 @@ import { UserDetails, World } from 'models/models';
 import { BehaviorSubject } from 'rxjs';
 
 export type WorldCallBack = {
-    time: (timestemp: number) => void;
+    animationFrame: (timestemp: number) => void;
     draw: () => void
 }
 
 export const defaultWorld = {
-    fps: 30,
+    dbf: 30,
     width: 1000,
     height: 1000
 } as World
@@ -21,11 +21,11 @@ export class WorldManager implements OnSimCreate {
 
     public subject = new BehaviorSubject<World>(defaultWorld);
 
-    private draw: { animationCount: number, fps: number, animationFrameId?: number, callback?: WorldCallBack} = DomRenderProxy.final({animationCount: 0, fps: defaultWorld.fps})
+    private draw: { animationCount: number, dbf: number, animationFrameId?: number, callback?: WorldCallBack} = DomRenderProxy.final({animationCount: 0, dbf: defaultWorld.dbf})
 
     constructor(public apiService: ApiService) {
         this.apiService.get<World>('/datas/world.json').then(it => {
-            this.draw.fps = it.fps;
+            this.draw.dbf = it.dbf;
             this.subject.next(it);
         })
     }
@@ -43,11 +43,11 @@ export class WorldManager implements OnSimCreate {
     // afterTime: number = 0;
     private drawIntervalStep(timestamp: number) {
         // const time = new Date().getTime();
-        this.draw.callback?.time(timestamp);
+        this.draw.callback?.animationFrame(timestamp);
         // console.log('--->', timestamp - this.afterTimeStemp, time - this.afterTime);
         // this.afterTimeStemp = timestamp;
         // this.afterTime = time;
-        if (this.draw.fps <= 0 || this.draw.animationCount % this.draw.fps === 0) {
+        if (this.draw.dbf <= 0 || this.draw.animationCount % this.draw.dbf === 0) {
             this.draw.callback?.draw();
             this.draw.animationCount = 0;
         }

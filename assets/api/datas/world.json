@@ -1,7 +1,7 @@
 {
   "width": 1000,
   "height": 1000,
-  "fps": 60,
+  "dbf": 20,
   "objects": [
 
   ]

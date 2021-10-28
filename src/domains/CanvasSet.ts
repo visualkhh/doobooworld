@@ -1,3 +1,5 @@
+import { Point } from 'math/Point';
+
 export class CanvasSet {
     constructor(public canvas: HTMLCanvasElement, public context: CanvasRenderingContext2D = canvas.getContext('2d')!) {
     }
@@ -19,6 +21,10 @@ export class CanvasSet {
         this.context.setTransform(1, 0, 0, 1, 0, 0);
         this.context.save();
         return this.context;
+    }
+
+    getCenter() {
+        return new Point(this.width / 2, this.height / 2)
     }
 
     get width() {

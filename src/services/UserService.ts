@@ -7,7 +7,7 @@ import { defaultWorld } from 'manasgers/WorldManager';
 
 export const defaultUser = {
     name: 'guest', use: false, world: {
-        center: {
+        position: {
             x: Math.floor(defaultWorld.width / 2),
             y: Math.floor(defaultWorld.height / 2),
         },

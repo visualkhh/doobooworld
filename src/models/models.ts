@@ -1,7 +1,7 @@
 export type World = {
     width: number,
     height: number,
-    fps: number,
+    dbf: number, // draw by browserAnimationFrame
     object: any[]
 }
 
@@ -11,12 +11,10 @@ export type UserDetails = {
     name: string;
     use: boolean;
     world: {
-        center: {
+        position: {
             x: number,
             y: number
         },
         zoom: number;
-        // tile: {
-        // }
     }
 }
