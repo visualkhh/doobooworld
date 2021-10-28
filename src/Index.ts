@@ -9,19 +9,30 @@ import { SimstanceManager } from 'simple-boot-core/simstance/SimstanceManager';
 import { UserService } from 'services/UserService';
 import { DomRenderProxy } from 'dom-render/DomRenderProxy';
 import { OnInitRender } from 'dom-render/lifecycle/OnInitRender';
-import { BehaviorSubject, filter, from, Subject } from 'rxjs';
+import { BehaviorSubject, filter, from, Subject, zip } from 'rxjs';
 import { Drawble } from 'draws/Drawble';
 import { Tile } from 'objects/Tile';
 import { Position } from 'domains/Position';
 import { CanvasSet } from 'domains/CanvasSet';
 import { OnInit } from 'simple-boot-front/lifecycle/OnInit';
+import { UserDetails, World } from 'models/models';
 
 @Sim()
 @Component({template, styles: [style]})
 export class Index implements Drawble, OnInit, OnInitRender {
     canvasSet?: CanvasSet;
     canvasContainer?: HTMLDivElement;
-    constructor(public worldManager: WorldManager, public simstanceManager: SimstanceManager, public tile: Tile) {
+    private worldData?: World;
+    private userData?: UserDetails;
+    private tile?: Tile;
+    constructor(public worldManager: WorldManager, public userService: UserService, public simstanceManager: SimstanceManager) {
+        // worldManager.subject.subscribe(it => this.worldData = it);
+        // userService.subject.subscribe(it => this.userData = it);
+        zip(worldManager.subject, userService.subject).subscribe(it => {
+            this.worldData = it[0]
+            this.userData = it[1];
+            this.tile = new Tile(this.worldData, this.userData);
+        })
     }
 
     onInitRender(): void {
@@ -61,7 +72,7 @@ export class Index implements Drawble, OnInit, OnInitRender {
 
 
     onTime(timestemp: number) {
-        this.tile.onTime(timestemp);
+        this.tile?.onTime(timestemp);
         // console.log('---time stemp--?', timestemp);
     }
 
@@ -70,7 +81,11 @@ export class Index implements Drawble, OnInit, OnInitRender {
             this.canvasSet.clearCanvas();
             // const context = this.canvasSet.clearResetCanvas();
             // context.strokeRect(25, 25, 100, 100);
-            this.tile.onDraw(this.canvasSet);
+            if (this.tile) {
+                this.tile.onDraw(this.canvasSet);
+            } else {
+                // loading...
+            }
             // this.objects.forEach(it => it.onDraw())
             // context.fillRect(25, 25, 100, 100);
         }

@@ -53,6 +53,7 @@ export class PointVector extends Point {
             this.y -= y;
             this.z -= z;
         }
+        return this;
     }
 
     public static sub(v1: PointVector, v2: PointVector): PointVector {
