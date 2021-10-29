@@ -14,34 +14,31 @@ import { MathUtil } from 'utils/MathUtil';
 
 export class Tile extends WorldObj {
 
-    point: {
-        point1: PointVector,
-        point2: PointVector,
-        point3: PointVector,
-        point4: PointVector
-    }
-
+    points: PointVector[] = [];
     current?: PointVector;
     currentFrame = 0;
-    frame = 30;
+    frame = 50;
     constructor(public worldData: World, public userData: UserDetails) {
-        super(2);
-        this.point = {
-            point1: new PointVector(10, 20),
-            point2: new PointVector(140, 80),
-            point3: new PointVector(290, 200),
-            point4: new PointVector(100, 420)
-        }
+        super(0);
+        this.points = [
+            new PointVector(10, 20),
+            new PointVector(140, 80),
+            new PointVector(290, 200),
+            new PointVector(100, 420)
+        ]
         this.x = userData.world.position.x;
         this.y = userData.world.position.y;
         this.width = userData.world.zoom
     }
 
     onProcess(): void {
-        if (this.frame <= this.currentFrame) {
+
+        this.current = MathUtil.bezier(this.points, this.frame, this.currentFrame);
+        this.currentFrame++;
+        if (this.frame <= this.currentFrame + 1 ) {
             this.currentFrame = 0;
         }
-        this.current = MathUtil.bezier(this.point, this.frame, this.currentFrame++);
+        // console.log('this->', this.current, current);
     }
 
     move(x: number, y: number, zoom: number) {
@@ -63,7 +60,7 @@ export class Tile extends WorldObj {
         const context = canvasSet.resetClearCanvas();
         // context.translate(-(tileSize / 2),-(tileSize / 2));
         // context.translate(this.x, this.y);
-        context.lineWidth = 1;
+        context.lineWidth = 0.1;
 
         for (let y = 0; y < tileHeightSize; y++) {
             for (let x = 0; x < tileWidthSize; x++) {
@@ -75,27 +72,19 @@ export class Tile extends WorldObj {
 
         // context.translate()
 
+        canvasSet.resetContext();
+        this.points.forEach(it => {
+            canvasSet.context.beginPath();
+            canvasSet.context.arc(it.x, it.y, 5, 0, 2 * Math.PI);
+            canvasSet.context.stroke();
+        })
 
-
-        // canvasSet.context.beginPath();
-        // canvasSet.context.arc(this.point.point1.x, this.point.point1.y, 5, 0, 2 * Math.PI);
-        // canvasSet.context.stroke();
-        // canvasSet.context.beginPath();
-        // canvasSet.context.arc(this.point.point2.x, this.point.point2.y, 5, 0, 2 * Math.PI);
-        // canvasSet.context.stroke();
-        // canvasSet.context.beginPath();
-        // canvasSet.context.arc(this.point.point3.x, this.point.point3.y, 5, 0, 2 * Math.PI);
-        // canvasSet.context.stroke();
-        // canvasSet.context.beginPath();
-        // canvasSet.context.arc(this.point.point4.x, this.point.point4.y, 5, 0, 2 * Math.PI);
-        // canvasSet.context.stroke();
-        //
-        // if (this.current) {
-        //     canvasSet.context.strokeStyle = '#000'
-        //     canvasSet.context.beginPath();
-        //     canvasSet.context.arc(this.current.x, this.current.y, 3, 0, 2 * Math.PI);
-        //     canvasSet.context.stroke();
-        // }
+        if (this.current) {
+            canvasSet.context.strokeStyle = '#000'
+            canvasSet.context.beginPath();
+            canvasSet.context.arc(this.current.x, this.current.y, 3, 0, 2 * Math.PI);
+            canvasSet.context.stroke();
+        }
         // const point = {point1: this.point1, point2: this.point2, point3: this.point3, point4: this.point4};
         // console.log('ppoo', point)
         // const pointVectors = new Array(30).fill(undefined);

@@ -9,7 +9,7 @@ export class Debug extends WorldObj {
     onDraws(canvasSet: CanvasSet): void {
         const center = canvasSet.getCenter();
         const context = canvasSet.context;
-        context.lineWidth = 4;
+        context.lineWidth = 1;
         context.setLineDash([4, 4]);
         context.strokeStyle = '#f00';
         context.beginPath();

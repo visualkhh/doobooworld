@@ -114,77 +114,88 @@ export class MathUtil {
 
 
     // Bezier
-    static bezirePointToPointVector(point: {point1: Point, point2?: Point, point3?: Point, point4?: Point}) {
-        if (!point.point2) {
-            point.point2 = point.point1;
+    static bezier(points: Point[], frame: number, idx: number): PointVector {
+        const pv = points.map(it => new PointVector(it.x, it.y, it.z))
+        const steps: PointVector[] = [];
+        pv.reduce((a, b) => {
+            const step = PointVector.sub(a, b).div(frame).mult(idx + 1);
+            steps.push(PointVector.sub(a, step));
+            return b;
+        });
+
+        if (steps.length <= 1) {
+            return steps[0];
         }
-        if (!point.point3) {
-            point.point3 = point.point2;
-        }
-        if (!point.point4) {
-            point.point4 = point.point3;
-        }
-        return {
-            point1: new PointVector(point.point1.x, point.point1.y, point.point1.z),
-            point2: new PointVector(point.point2.x, point.point2.y, point.point2.z),
-            point3: new PointVector(point.point3.x, point.point3.y, point.point3.z),
-            point4: new PointVector(point.point4.x, point.point4.y, point.point4.z),
-        }
+        return MathUtil.bezier(steps, frame, idx);
     }
-
-
-
-    static bezier(point: {point1: Point, point2?: Point, point3?: Point, point4?: Point}, frame: number, idx: number) {
-        const pointVector = MathUtil.bezirePointToPointVector(point);
-
-        const point12Step = PointVector.sub(pointVector.point1, pointVector.point2).div(frame).mult(idx + 1);
-        const point23Step = PointVector.sub(pointVector.point2, pointVector.point3).div(frame).mult(idx + 1);
-        const point34Step = PointVector.sub(pointVector.point3, pointVector.point4).div(frame).mult(idx + 1);
-
-        pointVector.point1.sub(point12Step);
-        pointVector.point2.sub(point23Step);
-        pointVector.point3.sub(point34Step);
-
-        const point12MoveStep = PointVector.sub(pointVector.point1, pointVector.point2).div(frame);
-        const point23MoveStep = PointVector.sub(pointVector.point2, pointVector.point3).div(frame);
-        // const point34MoveStep = PointVector.sub(point3, point4).div(frame); // 더이상갈곳없음
-
-        const cnt = idx + 1;
-        const point12MovePoint = point12MoveStep.mult(cnt)
-        const point23MovePoint = point23MoveStep.mult(cnt);
-        const combinationPoint1MovePoint = PointVector.sub(pointVector.point1, point12MovePoint); //new PointVector(point1.x - point12MovePoint.x, point1.y - point12MovePoint.y);
-        const combinationPoint2MovePoint = PointVector.sub(pointVector.point2, point23MovePoint); // new PointVector(point2.x - point23MovePoint.x, point2.y - point23MovePoint.y);
-
-        const finalPointMoveStep =  PointVector.sub(combinationPoint1MovePoint, combinationPoint2MovePoint).div(frame);
-        const finalPointMovePoint = finalPointMoveStep.mult(cnt);
-        const final = PointVector.sub(combinationPoint1MovePoint, finalPointMovePoint);
-        return final;
-    }
-
-    static beziers(point: {point1: Point, point2?: Point, point3?: Point, point4?: Point}, frame: number) {
-        const pointVector = MathUtil.bezirePointToPointVector(point);
-        const frames = new Array(frame).fill(undefined) as PointVector[];
-        for (let i = 0; i < frame; i++) {
-            frames[i] = MathUtil.bezier(point, frame, i);
-            // pointVector.point1.sub(point12Step);
-            // pointVector.point2.sub(point23Step);
-            // pointVector.point3.sub(point34Step);
-            //
-            // const point12MoveStep = PointVector.sub(pointVector.point1, pointVector.point2).div(frame);
-            // const point23MoveStep = PointVector.sub(pointVector.point2, pointVector.point3).div(frame);
-            // // const point34MoveStep = PointVector.sub(point3, point4).div(frame); // 더이상갈곳없음
-            //
-            // const cnt = i + 1;
-            // const point12MovePoint = point12MoveStep.mult(cnt)
-            // const point23MovePoint = point23MoveStep.mult(cnt);
-            // const combinationPoint1MovePoint = PointVector.sub(pointVector.point1, point12MovePoint); //new PointVector(point1.x - point12MovePoint.x, point1.y - point12MovePoint.y);
-            // const combinationPoint2MovePoint = PointVector.sub(pointVector.point2, point23MovePoint); // new PointVector(point2.x - point23MovePoint.x, point2.y - point23MovePoint.y);
-            //
-            // const finalPointMoveStep =  PointVector.sub(combinationPoint1MovePoint, combinationPoint2MovePoint).div(frame);
-            // const finalPointMovePoint = finalPointMoveStep.mult(cnt);
-            // const final = PointVector.sub(combinationPoint1MovePoint, finalPointMovePoint);
-        }
-        return frames;
-    }
+    // static bezirePointToPointVector(point: {point1: Point, point2?: Point, point3?: Point, point4?: Point}) {
+    //     if (!point.point2) {
+    //         point.point2 = point.point1;
+    //     }
+    //     if (!point.point3) {
+    //         point.point3 = point.point2;
+    //     }
+    //     if (!point.point4) {
+    //         point.point4 = point.point3;
+    //     }
+    //     return {
+    //         point1: new PointVector(point.point1.x, point.point1.y, point.point1.z),
+    //         point2: new PointVector(point.point2.x, point.point2.y, point.point2.z),
+    //         point3: new PointVector(point.point3.x, point.point3.y, point.point3.z),
+    //         point4: new PointVector(point.point4.x, point.point4.y, point.point4.z),
+    //     }
+    // }
+    // static bezier(point: {point1: Point, point2?: Point, point3?: Point, point4?: Point}, frame: number, idx: number) {
+    //     const pointVector = MathUtil.bezirePointToPointVector(point);
+    //
+    //     const point12Step = PointVector.sub(pointVector.point1, pointVector.point2).div(frame).mult(idx + 1);
+    //     const point23Step = PointVector.sub(pointVector.point2, pointVector.point3).div(frame).mult(idx + 1);
+    //     const point34Step = PointVector.sub(pointVector.point3, pointVector.point4).div(frame).mult(idx + 1);
+    //
+    //     pointVector.point1.sub(point12Step);
+    //     pointVector.point2.sub(point23Step);
+    //     pointVector.point3.sub(point34Step);
+    //
+    //     const point12MoveStep = PointVector.sub(pointVector.point1, pointVector.point2).div(frame);
+    //     const point23MoveStep = PointVector.sub(pointVector.point2, pointVector.point3).div(frame);
+    //     // const point34MoveStep = PointVector.sub(point3, point4).div(frame); // 더이상갈곳없음
+    //
+    //     const cnt = idx + 1;
+    //     const point12MovePoint = point12MoveStep.mult(cnt)
+    //     const point23MovePoint = point23MoveStep.mult(cnt);
+    //     const combinationPoint1MovePoint = PointVector.sub(pointVector.point1, point12MovePoint); //new PointVector(point1.x - point12MovePoint.x, point1.y - point12MovePoint.y);
+    //     const combinationPoint2MovePoint = PointVector.sub(pointVector.point2, point23MovePoint); // new PointVector(point2.x - point23MovePoint.x, point2.y - point23MovePoint.y);
+    //
+    //     const finalPointMoveStep =  PointVector.sub(combinationPoint1MovePoint, combinationPoint2MovePoint).div(frame);
+    //     const finalPointMovePoint = finalPointMoveStep.mult(cnt);
+    //     const final = PointVector.sub(combinationPoint1MovePoint, finalPointMovePoint);
+    //     return final;
+    // }
+    //
+    // static beziers(point: {point1: Point, point2?: Point, point3?: Point, point4?: Point}, frame: number) {
+    //     const pointVector = MathUtil.bezirePointToPointVector(point);
+    //     const frames = new Array(frame).fill(undefined) as PointVector[];
+    //     for (let i = 0; i < frame; i++) {
+    //         frames[i] = MathUtil.bezier(point, frame, i);
+    //         // pointVector.point1.sub(point12Step);
+    //         // pointVector.point2.sub(point23Step);
+    //         // pointVector.point3.sub(point34Step);
+    //         //
+    //         // const point12MoveStep = PointVector.sub(pointVector.point1, pointVector.point2).div(frame);
+    //         // const point23MoveStep = PointVector.sub(pointVector.point2, pointVector.point3).div(frame);
+    //         // // const point34MoveStep = PointVector.sub(point3, point4).div(frame); // 더이상갈곳없음
+    //         //
+    //         // const cnt = i + 1;
+    //         // const point12MovePoint = point12MoveStep.mult(cnt)
+    //         // const point23MovePoint = point23MoveStep.mult(cnt);
+    //         // const combinationPoint1MovePoint = PointVector.sub(pointVector.point1, point12MovePoint); //new PointVector(point1.x - point12MovePoint.x, point1.y - point12MovePoint.y);
+    //         // const combinationPoint2MovePoint = PointVector.sub(pointVector.point2, point23MovePoint); // new PointVector(point2.x - point23MovePoint.x, point2.y - point23MovePoint.y);
+    //         //
+    //         // const finalPointMoveStep =  PointVector.sub(combinationPoint1MovePoint, combinationPoint2MovePoint).div(frame);
+    //         // const finalPointMovePoint = finalPointMoveStep.mult(cnt);
+    //         // const final = PointVector.sub(combinationPoint1MovePoint, finalPointMovePoint);
+    //     }
+    //     return frames;
+    // }
 
 }
