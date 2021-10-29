@@ -13,13 +13,22 @@ import { RandomUtil } from 'utils/RandomUtil';
 import { MathUtil } from 'utils/MathUtil';
 import { Tile } from 'objects/tiles/Tile';
 import { Tiles } from 'objects/tiles/Tiles';
-
+export enum Direction {
+    UP,
+    DOWN,
+    LEFT,
+    RIGHT,
+    NONE
+}
 export class Space extends WorldObj {
     tils: Tiles;
     points: PointVector[] = [];
     current = new PointVector();
     currentFrame = 0;
     frame = 50;
+    wantX = -1;
+    wantY = -1;
+    direction = Direction.NONE;
     constructor(public worldData: World, public userData: UserDetails) {
         super(0);
         this.points = []
@@ -32,25 +41,65 @@ export class Space extends WorldObj {
 
     onProcess(): void {
 
-        this.current = MathUtil.bezier(this.points, this.frame, this.currentFrame);
-        this.currentFrame++;
-        if (this.frame <= this.currentFrame + 1 ) {
-            this.currentFrame = 0;
+        if (this.wantX >= 0 && this.wantY >= 0) {
+            this.current = MathUtil.bezier(this.points, this.frame, this.currentFrame);
+            if (this.direction === Direction.UP || this.direction === Direction.DOWN) {
+                this.current.x = 0;
+            } else if (this.direction === Direction.LEFT || this.direction === Direction.RIGHT) {
+                this.current.y = 0;
+            }
+            this.currentFrame++;
+            if (this.frame <= this.currentFrame + 1) {
+                this.currentFrame = 0;
+                this.points = [];
+                this.x = this.wantX;
+                this.y = this.wantY;
+                this.wantX = -1;
+                this.wantY = -1;
+                this.current = new PointVector();
+
+
+                console.log('--')
+            }
         }
         // console.log('this->', this.current, current);
     }
 
     up() {
-        const start = this.tils.getTile(this.x, this.y);
-        const end = this.tils.getTile(this.x, this.y - 1);
-        this.points = [start, start.get().sub(start.w, start.w / 2, 0), end]
-        // this.x = x;
-        // this.y = y;
+        const start = new PointVector(0,0,0);
+        const middle =  new PointVector(this.tils.config.w * 2, this.tils.config.h / 2, 0);
+        const end =  new PointVector(0, this.tils.config.h, 0);
+        this.points = [start, middle, end]
+        this.wantX = this.x;
+        this.wantY = this.y - 1;
+        this.direction = Direction.UP;
     }
     down() {
-        const start = this.tils.getTile(this.x, this.y);
-        const end = this.tils.getTile(this.x, this.y + 1);
-        this.points = [start, start.get().add(start.w, start.w / 2, 0), end]
+        const start = new PointVector(0,0,0);
+        const middle =  new PointVector(this.tils.config.w * 2, - this.tils.config.h / 2, 0);
+        const end =  new PointVector(0, -this.tils.config.h, 0);
+        this.points = [start, middle, end]
+        this.wantX = this.x;
+        this.wantY = this.y + 1;
+        this.direction = Direction.DOWN;
+    }
+    left() {
+        const start = new PointVector(0,0,0);
+        const middle =  new PointVector(this.tils.config.w / 2, this.tils.config.h * 2, 0);
+        const end =  new PointVector(this.tils.config.w, 0,0);
+        this.points = [start, middle, end]
+        this.wantX = this.x - 1;
+        this.wantY = this.y;
+        this.direction = Direction.LEFT;
+    }
+    right() {
+        const start = new PointVector(0,0,0);
+        const middle =  new PointVector(- this.tils.config.w / 2, this.tils.config.h * 2, 0);
+        const end =  new PointVector(-this.tils.config.w, 0,0);
+        this.points = [start, middle, end]
+        this.wantX = this.x + 1;
+        this.wantY = this.y;
+        this.direction = Direction.RIGHT;
     }
     move(x: number, y: number) {
         // const start = this.tils.getTile(this.x, this.y);
@@ -68,13 +117,14 @@ export class Space extends WorldObj {
 
 
         const context = canvasSet.context;
+        const center = canvasSet.getCenter(); // .add(10, 10, 10);
         context.lineWidth = 0.5;
         context.textAlign = "left";
         context.textBaseline = "top";
         context.font = '10px malgun gothic';
         // const tils1 = this.tils.setPosition(this.x, this.y, canvasSet.getCenter()).tils;
         // console.log(this.x, this.y, '--- ')
-        this.tils.setPosition(this.x, this.y, canvasSet.getCenter()).visibleTile({w: canvasSet.width, h: canvasSet.height}).forEach(it => {
+        this.tils.setPosition(this.x, this.y, PointVector.add(center, this.current)).visibleTile({w: canvasSet.width, h: canvasSet.height}).forEach(it => {
             it.forEach(sit => {
                 context.fillText(`${sit.xIdx}, ${sit.yIdx}`, sit.x, sit.y);
                 context.strokeRect(sit.x, sit.y, sit.w, sit.h);
@@ -122,20 +172,20 @@ export class Space extends WorldObj {
 
         // context.translate()
 
-        canvasSet.resetContext();
-        context.strokeStyle = '#f00'
-        this.points.forEach(it => {
-            canvasSet.context.beginPath();
-            canvasSet.context.arc(it.x, it.y, 5, 0, 2 * Math.PI);
-            canvasSet.context.stroke();
-        })
-        //
-        if (this.current) {
-            canvasSet.context.strokeStyle = '#00f'
-            canvasSet.context.beginPath();
-            canvasSet.context.arc(this.current.x, this.current.y, 3, 0, 2 * Math.PI);
-            canvasSet.context.stroke();
-        }
+        // canvasSet.resetContext();
+        // context.strokeStyle = '#f00'
+        // this.points.forEach(it => {
+        //     canvasSet.context.beginPath();
+        //     canvasSet.context.arc(it.x, it.y, 5, 0, 2 * Math.PI);
+        //     canvasSet.context.stroke();
+        // })
+        // //
+        // if (this.current) {
+        //     canvasSet.context.strokeStyle = '#00f'
+        //     canvasSet.context.beginPath();
+        //     canvasSet.context.arc(this.current.x, this.current.y, 3, 0, 2 * Math.PI);
+        //     canvasSet.context.stroke();
+        // }
 
 
         // const point = {point1: this.point1, point2: this.point2, point3: this.point3, point4: this.point4};
