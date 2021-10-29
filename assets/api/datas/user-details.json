@@ -3,8 +3,8 @@
   "use": true,
   "world": {
     "position": {
-      "x": 250,
-      "y": 250
+      "x": 5,
+      "y": 5
     },
     "zoom": 15
   }

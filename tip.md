@@ -3,6 +3,8 @@ rollup
 - https://flamingotiger.github.io/frontend/DevEnv/rollup-setup/
 canvas
 - https://www.youtube.com/watch?v=JFQOgt5DMBY
+- text
+  - align: https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/textAlign
 
 rxjs
 - array foreEach delay: https://observablehq.com/@btheado/rxjs-inserting-a-delay-between-each-item-of-a-stream

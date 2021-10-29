@@ -8,8 +8,8 @@ import { defaultWorld } from 'manasgers/WorldManager';
 export const defaultUser = {
     name: 'guest', use: false, world: {
         position: {
-            x: Math.floor(defaultWorld.width / 2),
-            y: Math.floor(defaultWorld.height / 2),
+            x: Math.floor(defaultWorld.w / 2),
+            y: Math.floor(defaultWorld.h / 2),
         },
         zoom: 15
     }

@@ -12,8 +12,9 @@ export type WorldCallBack = {
 
 export const defaultWorld = {
     dbf: 30,
-    width: 1000,
-    height: 1000
+    w: 1000,
+    h: 1000,
+    use: false
 } as World
 
 @Sim()

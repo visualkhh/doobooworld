@@ -11,7 +11,7 @@ import { DomRenderProxy } from 'dom-render/DomRenderProxy';
 import { OnInitRender } from 'dom-render/lifecycle/OnInitRender';
 import { BehaviorSubject, filter, from, Subject, zip } from 'rxjs';
 import { Drawble } from 'draws/Drawble';
-import { Tile } from 'objects/Tile';
+import { Space } from 'objects/Space';
 import { Position } from 'domains/Position';
 import { CanvasSet } from 'domains/CanvasSet';
 import { OnInit } from 'simple-boot-front/lifecycle/OnInit';
@@ -25,15 +25,15 @@ export class Index implements Drawble, OnInit {
     canvasContainer?: HTMLDivElement;
     private worldData?: World;
     private userData?: UserDetails;
-    private tile?: Tile;
+    private space?: Space;
     private debug = new Debug();
     constructor(public worldManager: WorldManager, public userService: UserService, public simstanceManager: SimstanceManager) {
         // worldManager.subject.subscribe(it => this.worldData = it);
         // userService.subject.subscribe(it => this.userData = it);
-        zip(this.worldManager.subject, this.userService.subject.pipe(filter(it => it.use))).subscribe(it => {
+        zip(this.worldManager.subject.pipe(filter(it => it.use)), this.userService.subject.pipe(filter(it => it.use))).subscribe(it => {
             this.worldData = it[0]
             this.userData = it[1];
-            this.tile = new Tile(this.worldData, this.userData);
+            this.space = new Space(this.worldData, this.userData);
         })
     }
 
@@ -66,7 +66,7 @@ export class Index implements Drawble, OnInit {
 
 
     animationFrame(timestemp: number) {
-        this.tile?.animationFrame(timestemp);
+        this.space?.animationFrame(timestemp);
         // console.log('---time stemp--?', timestemp);
     }
 
@@ -75,8 +75,8 @@ export class Index implements Drawble, OnInit {
             this.canvasSet.clearCanvas();
             // const context = this.canvasSet.clearResetCanvas();
             // context.strokeRect(25, 25, 100, 100);
-            if (this.tile) {
-                this.tile.onDraw(this.canvasSet);
+            if (this.space) {
+                this.space.onDraw(this.canvasSet);
             } else {
                 // loading...
             }

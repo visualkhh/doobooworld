@@ -3,43 +3,43 @@ import {PointVector} from "math/PointVector";
 export class Obj extends PointVector {
 
   // 질량
-  private _mass = 0;
+  private _m = 0;
   // 가로
-  private _width = 0;
+  private _w = 0;
   // 세로
-  private _height = 0;
+  private _h = 0;
   // 높이
-  private _depth = 0;
+  private _d = 0;
 
-  get mass(): number {
-    return this._mass;
+  get m(): number {
+    return this._m;
   }
 
-  set mass(value: number) {
-    this._mass = value;
+  set m(value: number) {
+    this._m = value;
   }
 
-  get width(): number {
-    return this._width;
+  get w(): number {
+    return this._w;
   }
 
-  set width(value: number) {
-    this._width = value;
+  set w(value: number) {
+    this._w = value;
   }
 
-  get height(): number {
-    return this._height;
+  get h(): number {
+    return this._h;
   }
 
-  set height(value: number) {
-    this._height = value;
+  set h(value: number) {
+    this._h = value;
   }
 
-  get depth(): number {
-    return this._depth;
+  get d(): number {
+    return this._d;
   }
 
-  set depth(value: number) {
-    this._depth = value;
+  set d(value: number) {
+    this._d = value;
   }
 }

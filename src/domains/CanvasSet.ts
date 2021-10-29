@@ -1,4 +1,5 @@
 import { Point } from 'math/Point';
+import { PointVector } from 'math/PointVector';
 
 export class CanvasSet {
     constructor(public canvas: HTMLCanvasElement, public context: CanvasRenderingContext2D = canvas.getContext('2d')!) {
@@ -24,7 +25,7 @@ export class CanvasSet {
     }
 
     getCenter() {
-        return new Point(this.width / 2, this.height / 2)
+        return new PointVector(this.width / 2, this.height / 2, 0)
     }
 
     get width() {

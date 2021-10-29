@@ -2,10 +2,10 @@
 <canvas dr-on-init="this.onInitCanvas" class="canvas"></canvas>
 </div>
 <div>
-    <div style="text-align: center"><button>▲</button></div>
+    <div style="text-align: center"><button dr-event-click="this.space.up()">▲</button></div>
     <div style="text-align: center"><button>◀︎</button> <button>▶︎</button></div>
-    <div style="text-align: center"><button>▼</button></div>
+    <div style="text-align: center"><button dr-event-click="this.space.down()">▼</button></div>
 </div>
 <div>
-    <div style="text-align: center"><button dr-event-click="this.tile.userData.world.zoom--">+</button> <button dr-event-click="this.tile.userData.world.zoom++">-</button></div>
+    <div style="text-align: center"><button dr-event-click="this.space.w--">+</button> <button dr-event-click="this.space.w++">-</button></div>
 </div>

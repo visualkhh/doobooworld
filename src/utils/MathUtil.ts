@@ -115,18 +115,22 @@ export class MathUtil {
 
     // Bezier
     static bezier(points: Point[], frame: number, idx: number): PointVector {
-        const pv = points.map(it => new PointVector(it.x, it.y, it.z))
-        const steps: PointVector[] = [];
-        pv.reduce((a, b) => {
-            const step = PointVector.sub(a, b).div(frame).mult(idx + 1);
-            steps.push(PointVector.sub(a, step));
-            return b;
-        });
+        if (points && points.length > 0) {
+            const pv = points.map(it => new PointVector(it.x, it.y, it.z))
+            const steps: PointVector[] = [];
+            pv.reduce((a, b) => {
+                const step = PointVector.sub(a, b).div(frame).mult(idx + 1);
+                steps.push(PointVector.sub(a, step));
+                return b;
+            });
 
-        if (steps.length <= 1) {
-            return steps[0];
+            if (steps.length <= 1) {
+                return steps[0];
+            }
+            return MathUtil.bezier(steps, frame, idx);
+        } else {
+            return new PointVector();
         }
-        return MathUtil.bezier(steps, frame, idx);
     }
     // static bezirePointToPointVector(point: {point1: Point, point2?: Point, point3?: Point, point4?: Point}) {
     //     if (!point.point2) {

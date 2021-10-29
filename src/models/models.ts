@@ -1,8 +1,9 @@
 export type World = {
-    width: number,
-    height: number,
+    w: number,
+    h: number,
     dbf: number, // draw by browserAnimationFrame
-    object: any[]
+    object: any[],
+    use: boolean;
 }
 
 

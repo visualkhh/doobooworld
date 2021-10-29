@@ -37,6 +37,7 @@ export class PointVector extends Point {
             this.y += y;
             this.z += z;
         }
+        return this;
     }
 
     public static add(v1: PointVector, v2: PointVector): PointVector {
