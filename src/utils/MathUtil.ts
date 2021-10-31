@@ -114,6 +114,13 @@ export class MathUtil {
 
 
     // Bezier
+    static beziers(points: Point[], frame: number) {
+        const datas = new Array(frame).fill(undefined)
+        for (let i = 0; i < datas.length; i++) {
+            datas[i] = MathUtil.bezier(points, frame, i);
+        }
+        return datas;
+    }
     static bezier(points: Point[], frame: number, idx: number): PointVector {
         if (points && points.length > 0) {
             const pv = points.map(it => new PointVector(it.x, it.y, it.z))

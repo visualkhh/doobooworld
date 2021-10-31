@@ -2,7 +2,7 @@ import { Tile } from 'objects/tiles/Tile';
 import { Point } from 'math/Point';
 
 export class Tiles {
-    private tils: Tile[][];
+    public tils: Tile[][];
 
     constructor(public w: number, public h: number, private _config: {w: number, h: number} = {w:0, h:w}) {
         this.tils = Array.from(Array(h), () => Array(w).fill(undefined))
@@ -22,8 +22,8 @@ export class Tiles {
 
     }
 
-    getTile(x: number, y: number): Tile {
-        return this.tils[y][x];
+    getTile(xIdx: number, yIdx: number): Tile {
+        return this.tils[yIdx][xIdx];
     }
 
     visibleTile({w, h}: {w: number, h: number}) {

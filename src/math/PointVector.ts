@@ -120,6 +120,7 @@ export class PointVector extends Point {
     public normalize() {
         const m = this.mag();
         if (m > 0) this.div(m);
+        return this;
     }
 
     public limit(high: number) {
@@ -127,6 +128,7 @@ export class PointVector extends Point {
             this.normalize();
             this.mult(high);
         }
+        return this;
     }
 
     public heading2D() {

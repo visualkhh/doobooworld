@@ -15,16 +15,19 @@ import { Space } from 'objects/Space';
 import { Position } from 'domains/Position';
 import { CanvasSet } from 'domains/CanvasSet';
 import { OnInit } from 'simple-boot-front/lifecycle/OnInit';
-import { UserDetails, World } from 'models/models';
+import { UserDetailsData, WorldData } from 'models/models';
 import { Debug } from 'objects/Debug';
+import { WorldObj } from 'objects/base/WorldObj';
+import { PTDB } from 'objects/PTDB';
 
 @Sim()
 @Component({template, styles: [style]})
 export class Index implements Drawble, OnInit {
     canvasSet?: CanvasSet;
     canvasContainer?: HTMLDivElement;
-    private worldData?: World;
-    private userData?: UserDetails;
+    private worldData?: WorldData;
+    private userData?: UserDetailsData;
+    private objects: WorldObj[] = [];
     private space?: Space;
     private debug = new Debug();
     constructor(public worldManager: WorldManager, public userService: UserService, public simstanceManager: SimstanceManager) {
@@ -34,21 +37,23 @@ export class Index implements Drawble, OnInit {
             this.worldData = it[0]
             this.userData = it[1];
             this.space = new Space(this.worldData, this.userData);
+            this.worldData?.objects.forEach(it => {
+                if (it.type === 'ptdb') {
+                    this.objects.push(new PTDB(DomRenderProxy.final(this.space)!, it))
+                }
+            })
         })
     }
 
     onInit(): void {
-        console.log('--22--')
         window.addEventListener('resize', ev => {
             this.resizeCanvase();
         });
     }
 
     onInitCanvas(canvas: HTMLCanvasElement) {
-        console.log('-????')
         this.canvasSet = new CanvasSet(canvas);
         this.resizeCanvase();
-
         this.onDraw();
         this.worldManager.drawInterval({animationFrame: this.animationFrame.bind(this), draw: this.onDraw.bind(this)});
     }
@@ -67,7 +72,7 @@ export class Index implements Drawble, OnInit {
 
     animationFrame(timestemp: number) {
         this.space?.animationFrame(timestemp);
-        // console.log('---time stemp--?', timestemp);
+        this.objects.forEach(it => it.animationFrame(timestemp));
     }
 
     onDraw() {
@@ -77,6 +82,7 @@ export class Index implements Drawble, OnInit {
             // context.strokeRect(25, 25, 100, 100);
             if (this.space) {
                 this.space.onDraw(this.canvasSet);
+                this.objects.forEach(it => it.onDraw(this.canvasSet));
             } else {
                 // loading...
             }

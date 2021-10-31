@@ -2,7 +2,7 @@ import { Sim } from 'simple-boot-core/decorators/SimDecorator';
 import { DomRenderProxy } from 'dom-render/DomRenderProxy';
 import { ApiService } from 'services/ApiService';
 import { OnSimCreate } from 'simple-boot-core/lifecycle/OnSimCreate';
-import { UserDetails, World } from 'models/models';
+import { UserDetailsData, WorldData } from 'models/models';
 import { BehaviorSubject } from 'rxjs';
 
 export type WorldCallBack = {
@@ -15,17 +15,17 @@ export const defaultWorld = {
     w: 1000,
     h: 1000,
     use: false
-} as World
+} as WorldData
 
 @Sim()
 export class WorldManager implements OnSimCreate {
 
-    public subject = new BehaviorSubject<World>(defaultWorld);
+    public subject = new BehaviorSubject<WorldData>(defaultWorld);
 
     private draw: { animationCount: number, dbf: number, animationFrameId?: number, callback?: WorldCallBack} = DomRenderProxy.final({animationCount: 0, dbf: defaultWorld.dbf})
 
     constructor(public apiService: ApiService) {
-        this.apiService.get<World>('/datas/world.json').then(it => {
+        this.apiService.get<WorldData>('/datas/world.json').then(it => {
             this.draw.dbf = it.dbf;
             this.subject.next(it);
         })

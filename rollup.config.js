@@ -1,3 +1,4 @@
+import babel from "@rollup/plugin-babel";
 import replace from '@rollup/plugin-replace';
 import copy from 'rollup-plugin-copy';
 import resolve from 'rollup-plugin-node-resolve';
@@ -16,7 +17,7 @@ export default {
         format: 'cjs'
     },
     plugins: [
-        // babel(),
+        babel(),
         css(),
         html({include: '**/*.html'}),
         copy({
@@ -30,10 +31,18 @@ export default {
         typescript({ tsconfig: './tsconfig.json', clean: true }),
         sourcemaps(),
         // typescript({outDir: './dist', module: 'commonjs', declaration: false}),
+        // replace({
+        //     preventAssignment: true,
+        //     "Object.defineProperty(exports, '__esModule', { value: true });": "try{if(!exports) {var exports = {}}}catch (e) {var exports = {}} Object.defineProperty(exports, '__esModule', { value: true });",
+        //     delimiters: ['\n', '\n']
+        // }),
         replace({
-            preventAssignment: true,
+            "function __extends(d, b) {\n  if (typeof b !== \"function\" && b !== null) throw new TypeError(\"Class extends value \" + String(b) + \" is not a constructor or null\");\n  extendStatics(d, b);"
+                :
+                "function __extends(d, b) {if (typeof b !== \"function\" && b !== null) throw new TypeError(\"Class extends value \" + String(b) + \" is not a constructor or null\");",
             "Object.defineProperty(exports, '__esModule', { value: true });": "try{if(!exports) {var exports = {}}}catch (e) {var exports = {}} Object.defineProperty(exports, '__esModule', { value: true });",
-            delimiters: ['\n', '\n']
+            delimiters: ['\n', '\n'],
+            preventAssignment: true
         }),
         del({ targets: ['dist/*'] })
     ]
