@@ -1,10 +1,11 @@
 import { Tile } from 'objects/tiles/Tile';
 import { Point } from 'math/Point';
+import { WorldObj } from 'objects/base/WorldObj';
 
 export class Tiles {
     public tils: Tile[][];
 
-    constructor(public w: number, public h: number, private _config: {w: number, h: number} = {w:0, h:w}) {
+    constructor(public w: number, public h: number, private _config: {w: number, h: number} = {w:0, h:w}, private objects: WorldObj[]) {
         this.tils = Array.from(Array(h), () => Array(w).fill(undefined))
     }
 

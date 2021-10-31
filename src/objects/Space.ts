@@ -25,7 +25,7 @@ export class Space extends WorldObj {
     points: PointVector[] = [];
     current = new PointVector();
     currentFrame = 0;
-    constructor(public worldData: WorldData, public userData: UserDetailsData) {
+    constructor(public worldData: WorldData, public userData: UserDetailsData, objects: WorldObj[]) {
         super(worldData.pbf);
         this.points = [
             // new PointVector(10, 10, 10),
@@ -36,7 +36,7 @@ export class Space extends WorldObj {
         this.x = userData.world.position.x;
         this.y = userData.world.position.y;
         this.z = userData.world.zoom;
-       this.tils = new Tiles(worldData.w, worldData.h);
+       this.tils = new Tiles(worldData.w, worldData.h, undefined, objects);
         // console.log('-->', this.tils)
     }
 

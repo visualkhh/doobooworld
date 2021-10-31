@@ -36,7 +36,7 @@ export class Index implements Drawble, OnInit {
         zip(this.worldManager.subject.pipe(filter(it => it.use)), this.userService.subject.pipe(filter(it => it.use))).subscribe(it => {
             this.worldData = it[0]
             this.userData = it[1];
-            this.space = new Space(this.worldData, this.userData);
+            this.space = new Space(this.worldData, this.userData, this.objects);
             this.worldData?.objects.forEach(it => {
                 if (it.type === 'ptdb') {
                     this.objects.push(new PTDB(DomRenderProxy.final(this.space)!, it))
