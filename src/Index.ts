@@ -19,6 +19,7 @@ import { UserDetailsData, WorldData } from 'models/models';
 import { Debug } from 'objects/Debug';
 import { WorldObj } from 'objects/base/WorldObj';
 import { PTDB } from 'objects/PTDB';
+import { PointVector } from 'math/PointVector';
 
 @Sim()
 @Component({template, styles: [style]})
@@ -31,8 +32,6 @@ export class Index implements Drawble, OnInit {
     private space?: Space;
     private debug = new Debug();
     constructor(public worldManager: WorldManager, public userService: UserService, public simstanceManager: SimstanceManager) {
-        // worldManager.subject.subscribe(it => this.worldData = it);
-        // userService.subject.subscribe(it => this.userData = it);
         zip(this.worldManager.subject.pipe(filter(it => it.use)), this.userService.subject.pipe(filter(it => it.use))).subscribe(it => {
             this.worldData = it[0]
             this.userData = it[1];
@@ -53,6 +52,14 @@ export class Index implements Drawble, OnInit {
 
     onInitCanvas(canvas: HTMLCanvasElement) {
         this.canvasSet = new CanvasSet(canvas);
+        canvas.addEventListener('click', (e: MouseEvent) => {
+            if (e.target) {
+                const boundingClientRect = (e.target as HTMLCanvasElement).getBoundingClientRect();
+                const pointVector = new PointVector(e.clientX - boundingClientRect.left, e.clientY - boundingClientRect.top);
+                this.space?.click(pointVector, e);
+                this.objects.forEach(it => it.click(pointVector, e));
+            }
+        })
         this.resizeCanvase();
         this.onDraw();
         this.worldManager.drawInterval({animationFrame: this.animationFrame.bind(this), draw: this.onDraw.bind(this)});

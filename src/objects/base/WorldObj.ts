@@ -30,4 +30,7 @@ export abstract class WorldObj extends Obj implements Drawble {
   public addEventListener(eventType: EventTypes) {
 
   }
+  public click(point: PointVector, event: MouseEvent) {
+
+  }
 }

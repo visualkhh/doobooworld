@@ -13,7 +13,6 @@ export class PTDB extends WorldObj {
         this.w = data.volume.w;
         this.h = data.volume.h;
         const image = new Image(60, 60); // Using optional size for image
-        const thiss = this;
         image.onload = () => {
             this.image = image;
         }
@@ -24,15 +23,18 @@ export class PTDB extends WorldObj {
     }
 
     onDraws(canvasSet: CanvasSet): void {
-        const context = canvasSet.context;
         const tile = this.space.tils.getTile(this.x, this.y);
+        if (!tile.canDraw()) {
+            return;
+        }
+        const context = canvasSet.context;
         const center = canvasSet.getCenter(); // .add(10, 10, 10);
         context.lineWidth = 0.5;
         context.textAlign = "left";
         context.textBaseline = "top";
         context.font = '10px malgun gothic';
         if (this.image) {
-            context.drawImage(this.image, tile.x, tile.y, this.space.tils.config.w * this.w, this.space.tils.config.w * this.h)
+            context.drawImage(this.image, tile.x, tile.y, this.space.tils.config.getTileVolumePx() * this.w, this.space.tils.config.getTileVolumePx() * this.h)
         }
         // context.beginPath();
         // context.arc(tile.x, tile.y, 5, 0, 2 * Math.PI);

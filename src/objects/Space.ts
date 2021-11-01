@@ -1,17 +1,8 @@
-import { Drawble } from 'draws/Drawble';
-import { Position } from 'domains/Position';
 import { CanvasSet } from 'domains/CanvasSet';
-import { Point } from 'math/Point';
-import {Sim} from 'simple-boot-core/decorators/SimDecorator'
-import { UserService } from 'services/UserService';
-import { WorldManager } from 'manasgers/WorldManager';
 import { UserDetailsData, WorldData } from 'models/models';
-import { concatMap, delay, filter, from, interval, of, take } from 'rxjs';
 import { WorldObj } from 'objects/base/WorldObj';
 import { PointVector } from 'math/PointVector';
-import { RandomUtil } from 'utils/RandomUtil';
 import { MathUtil } from 'utils/MathUtil';
-import { Tile } from 'objects/tiles/Tile';
 import { Tiles } from 'objects/tiles/Tiles';
 // export enum Direction {
 //     UP,
@@ -25,6 +16,7 @@ export class Space extends WorldObj {
     points: PointVector[] = [];
     current = new PointVector();
     currentFrame = 0;
+
     constructor(public worldData: WorldData, public userData: UserDetailsData, objects: WorldObj[]) {
         super(worldData.pbf);
         this.points = [
@@ -36,18 +28,17 @@ export class Space extends WorldObj {
         this.x = userData.world.position.x;
         this.y = userData.world.position.y;
         this.z = userData.world.zoom;
-       this.tils = new Tiles(worldData.w, worldData.h, undefined, objects);
+        this.tils = new Tiles(worldData.w, worldData.h, objects);
         // console.log('-->', this.tils)
     }
 
     public before = new PointVector();
+
     onProcess(): void {
         if (this.points && this.points.length > 0) {
             this.current = MathUtil.bezier(this.points, this.worldData.frame, this.currentFrame);
-            // console.log('-?', this.current)
             this.add(PointVector.sub(this.current, this.before));
             this.before = this.current;
-            // console.log('??~~', this.currentFrame, this, this.current)
             if (this.worldData.frame <= this.currentFrame + 1) {
                 this.currentFrame = 0;
                 this.points = [];
@@ -65,48 +56,74 @@ export class Space extends WorldObj {
     }
 
     up() {
-        const starts = [new PointVector(0,0,0), new PointVector(0, -0.2, 0)];
+        const starts = [new PointVector(0, 0, 0), new PointVector(0, -0.2, 0)];
         const ends = [new PointVector(0, -0.8, 0), new PointVector(0, -1, 0)]
         this.points = [...starts, ...ends]
         this.currentFrame = 0
     }
+
     down() {
-        const starts = [new PointVector(0,0,0), new PointVector(0, 0.2, 0)];
+        const starts = [new PointVector(0, 0, 0), new PointVector(0, 0.2, 0)];
         const ends = [new PointVector(0, 0.8, 0), new PointVector(0, 1, 0)]
         this.points = [...starts, ...ends]
         this.currentFrame = 0
     }
+
     left() {
-        const starts = [new PointVector(0,0,0), new PointVector(-0.2, 0, 0)];
+        const starts = [new PointVector(0, 0, 0), new PointVector(-0.2, 0, 0)];
         const ends = [new PointVector(-0.8, 0, 0), new PointVector(-1, 0, 0)]
         this.points = [...starts, ...ends]
         this.currentFrame = 0
     }
+
     right() {
-        const starts = [new PointVector(0,0,0), new PointVector(0.2, 0, 0)];
+        const starts = [new PointVector(0, 0, 0), new PointVector(0.2, 0, 0)];
         const ends = [new PointVector(0.8, 0, 0), new PointVector(1, 0, 0)]
         this.points = [...starts, ...ends]
         this.currentFrame = 0;
     }
 
     zoomIn() {
-        const starts = [new PointVector(0,0,0), new PointVector(0, 0, -0.2)];
+        const starts = [new PointVector(0, 0, 0), new PointVector(0, 0, -0.2)];
         const ends = [new PointVector(0, 0, -0.8), new PointVector(0, 0, -1)]
         this.points = [...starts, ...ends]
         this.currentFrame = 0;
     }
 
     zoomOut() {
-        const starts = [new PointVector(0,0,0), new PointVector(0, 0, 0.2)];
+        const starts = [new PointVector(0, 0, 0), new PointVector(0, 0, 0.2)];
         const ends = [new PointVector(0, 0, 0.8), new PointVector(0, 0, 1)]
         this.points = [...starts, ...ends]
         this.currentFrame = 0;
     }
 
-    onDraws(canvasSet:CanvasSet): void {
-        const tileSize = canvasSet.canvas.width / this.z
-        this.tils.config = {w: tileSize, h: tileSize};
+    public clicked: PointVector[] = []
 
+    click(point: PointVector, event: MouseEvent) {
+        const tileByPx = this.tils.getTileByPx(point);
+        if (tileByPx) {
+            const dest = PointVector.sub(new PointVector(tileByPx.xIdx, tileByPx.yIdx), this)
+            dest.z = 0;
+            const starts = [new PointVector(0, 0, 0)];
+            const ends = [dest]
+            this.points = [...starts, ...ends]
+            this.currentFrame = 0;
+        }
+        this.clicked.push(point)
+    }
+
+    onDraws(canvasSet: CanvasSet): void {
+        const displayStart = new PointVector(MathUtil.getValueByTotInPercent(20, canvasSet.width), MathUtil.getValueByTotInPercent(20, canvasSet.height));
+        const displayEnd = new PointVector(canvasSet.width, canvasSet.height).sub(displayStart);
+        this.tils.config.set(displayStart, displayEnd, this.z);
+
+        // display
+        // canvasSet.context.beginPath();
+        // canvasSet.context.arc(this.tils.config.displayStart.x, this.tils.config.displayStart.y, 5, 0, 2 * Math.PI);
+        // canvasSet.context.stroke();
+        // canvasSet.context.beginPath();
+        // canvasSet.context.arc(this.tils.config.displayEnd.x, this.tils.config.displayEnd.y, 5, 0, 2 * Math.PI);
+        // canvasSet.context.stroke();
 
         const context = canvasSet.context;
         const center = canvasSet.getCenter(); // .add(10, 10, 10);
@@ -119,13 +136,17 @@ export class Space extends WorldObj {
         // context.drawImage()
         // const tils1 = this.tils.setPosition(this.x, this.y, canvasSet.getCenter()).tils;
         // console.log(this.x, this.y, '--- ')
-        this.tils.setPosition(this.x, this.y, center).visibleTile({w: canvasSet.width, h: canvasSet.height}).forEach(it => {
+        this.tils.setPosition(this.x, this.y, center).canDrawTiles().forEach(it => {
             it.forEach(sit => {
                 context.fillText(`${sit.xIdx}, ${sit.yIdx}`, sit.x, sit.y);
                 context.strokeRect(sit.x, sit.y, sit.w, sit.h);
             })
         });
-
+        this.clicked.forEach(it => {
+            canvasSet.context.beginPath();
+            canvasSet.context.arc(it.x, it.y, 5, 0, 2 * Math.PI);
+            canvasSet.context.stroke();
+        });
 
 
         // this.tils.setPosition(this.x, this.y, canvasSet.getCenter()).tils.forEach(it => {
@@ -175,7 +196,7 @@ export class Space extends WorldObj {
         context.strokeStyle = '#f00'
         this.points.forEach(it => {
             canvasSet.context.beginPath();
-            canvasSet.context.arc(it.x+100, it.y+100, 5, 0, 2 * Math.PI);
+            canvasSet.context.arc(it.x + 100, it.y + 100, 5, 0, 2 * Math.PI);
             canvasSet.context.stroke();
         })
         // //
@@ -217,5 +238,9 @@ export class Space extends WorldObj {
         // })
 
 
+        const pointVector = displayEnd.get().sub(displayStart);
+        context.strokeRect(
+            displayStart.x, displayStart.y,
+            pointVector.x, pointVector.y);
     }
 }
