@@ -18,7 +18,7 @@ export class TilesConfig {
 export class Tiles {
     public tils: Tile[][];
     public config = new TilesConfig()
-    constructor(public w: number, public h: number, private objects: WorldObj[]) {
+    constructor(public w: number, public h: number) {
         this.tils = Array.from(Array(h), () => Array(w).fill(undefined))
     }
 
@@ -37,7 +37,7 @@ export class Tiles {
         }
     }
 
-    getTile(xIdx: number, yIdx: number): Tile {
+    getTileByIdx(xIdx: number, yIdx: number): Tile {
         return this.tils[yIdx][xIdx];
     }
 

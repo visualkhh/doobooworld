@@ -12,18 +12,22 @@ export class PTDB extends WorldObj {
         this.y = data.position.y;
         this.w = data.volume.w;
         this.h = data.volume.h;
-        const image = new Image(60, 60); // Using optional size for image
-        image.onload = () => {
-            this.image = image;
-        }
-        image.src = 'assets/images/ptdb.jpeg';
+        // const image = new Image(60, 60); // Using optional size for image
+        // image.onload = () => {
+        //     this.image = image;
+        // }
+        // image.src = 'assets/images/ptdb.jpeg';
     }
 
-    onProcess(): void {
+    animationFrame(timestamp: number): void {
     }
 
-    onDraws(canvasSet: CanvasSet): void {
-        const tile = this.space.tils.getTile(this.x, this.y);
+    isWorkable(): boolean {
+        return this.space.isWorkable();
+    }
+
+    onDraw(canvasSet: CanvasSet): void {
+        const tile = this.space.tils!.getTileByIdx(this.x, this.y);
         if (!tile.canDraw()) {
             return;
         }
@@ -33,9 +37,9 @@ export class PTDB extends WorldObj {
         context.textAlign = "left";
         context.textBaseline = "top";
         context.font = '10px malgun gothic';
-        if (this.image) {
-            context.drawImage(this.image, tile.x, tile.y, this.space.tils.config.getTileVolumePx() * this.w, this.space.tils.config.getTileVolumePx() * this.h)
-        }
+        // if (this.image) {
+        //     context.drawImage(this.image, tile.x, tile.y, this.space.tils!.config.getTileVolumePx() * this.w, this.space.tils!.config.getTileVolumePx() * this.h)
+        // }
         // context.beginPath();
         // context.arc(tile.x, tile.y, 5, 0, 2 * Math.PI);
         // context.stroke();

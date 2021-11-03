@@ -6,42 +6,31 @@ import template from './index.html'
 import style from './index.css'
 import { WorldManager } from 'manasgers/WorldManager';
 import { SimstanceManager } from 'simple-boot-core/simstance/SimstanceManager';
-import { UserService } from 'services/UserService';
-import { DomRenderProxy } from 'dom-render/DomRenderProxy';
-import { OnInitRender } from 'dom-render/lifecycle/OnInitRender';
-import { BehaviorSubject, filter, from, Subject, zip } from 'rxjs';
+import { Subject } from 'rxjs';
 import { Drawble } from 'draws/Drawble';
 import { Space } from 'objects/Space';
-import { Position } from 'domains/Position';
 import { CanvasSet } from 'domains/CanvasSet';
 import { OnInit } from 'simple-boot-front/lifecycle/OnInit';
-import { UserDetailsData, WorldData } from 'models/models';
 import { Debug } from 'objects/Debug';
-import { WorldObj } from 'objects/base/WorldObj';
-import { PTDB } from 'objects/PTDB';
 import { PointVector } from 'math/PointVector';
+import { Controller } from 'objects/controller/Controller';
+import { Me } from 'objects/Me';
+import { ObjectsManager } from 'manasgers/ObjectsManager';
+import { ResourceManager } from 'manasgers/ResourceManager';
+import { WorldObj } from 'objects/base/WorldObj';
 
 @Sim()
 @Component({template, styles: [style]})
 export class Index implements Drawble, OnInit {
     canvasSet?: CanvasSet;
     canvasContainer?: HTMLDivElement;
-    private worldData?: WorldData;
-    private userData?: UserDetailsData;
-    private objects: WorldObj[] = [];
-    private space?: Space;
     private debug = new Debug();
-    constructor(public worldManager: WorldManager, public userService: UserService, public simstanceManager: SimstanceManager) {
-        zip(this.worldManager.subject.pipe(filter(it => it.use)), this.userService.subject.pipe(filter(it => it.use))).subscribe(it => {
-            this.worldData = it[0]
-            this.userData = it[1];
-            this.space = new Space(this.worldData, this.userData, this.objects);
-            this.worldData?.objects.forEach(it => {
-                if (it.type === 'ptdb') {
-                    this.objects.push(new PTDB(DomRenderProxy.final(this.space)!, it))
-                }
-            })
-        })
+
+    constructor(private worldManager: WorldManager, private simstanceManager: SimstanceManager, private objectManager: ObjectsManager,
+                private space: Space,
+                private me: Me,
+                private controller: Controller,
+    ) {
     }
 
     onInit(): void {
@@ -52,14 +41,12 @@ export class Index implements Drawble, OnInit {
 
     onInitCanvas(canvas: HTMLCanvasElement) {
         this.canvasSet = new CanvasSet(canvas);
-        canvas.addEventListener('click', (e: MouseEvent) => {
-            if (e.target) {
-                const boundingClientRect = (e.target as HTMLCanvasElement).getBoundingClientRect();
-                const pointVector = new PointVector(e.clientX - boundingClientRect.left, e.clientY - boundingClientRect.top);
-                this.space?.click(pointVector, e);
-                this.objects.forEach(it => it.click(pointVector, e));
-            }
-        })
+        canvas.addEventListener('click', (e: MouseEvent) => this.click(e));
+        canvas.addEventListener('mousedown', (e: MouseEvent) => this.mouseDown(e));
+        canvas.addEventListener('mouseup', (e: MouseEvent) => this.mouseUp(e));
+        window.addEventListener('keydown', (e: KeyboardEvent) => this.keyDown(e));
+        window.addEventListener('keyup', (e: KeyboardEvent) => this.keyUp(e));
+        canvas.addEventListener('touchstart', (e: TouchEvent) => this.mouseDown(e));
         this.resizeCanvase();
         this.onDraw();
         this.worldManager.drawInterval({animationFrame: this.animationFrame.bind(this), draw: this.onDraw.bind(this)});
@@ -78,32 +65,103 @@ export class Index implements Drawble, OnInit {
 
 
     animationFrame(timestemp: number) {
-        this.space?.animationFrame(timestemp);
-        this.objects.forEach(it => it.animationFrame(timestemp));
+        this.space.animationFrameWorkable(timestemp);
+        this.objectManager.objects.forEach(it => it.animationFrameWorkable(timestemp))
+        this.me.animationFrameWorkable(timestemp);
+        this.controller.animationFrameWorkable(timestemp);
     }
 
     onDraw() {
         if (this.canvasSet) {
             this.canvasSet.clearCanvas();
-            // const context = this.canvasSet.clearResetCanvas();
-            // context.strokeRect(25, 25, 100, 100);
-            if (this.space) {
-                this.space.onDraw(this.canvasSet);
-                this.objects.forEach(it => it.onDraw(this.canvasSet));
-            } else {
-                // loading...
-            }
-            // this.objects.forEach(it => it.onDraw())
-            // context.fillRect(25, 25, 100, 100);
 
-            this.debug
-            this.debug.onDraw(this.canvasSet);
+            if (this.space.onDrawWrokable(this.canvasSet)) {
+                this.objectManager.objects.forEach(it => it.onDrawWrokable(this.canvasSet))
+                this.me.onDrawWrokable(this.canvasSet);
+                this.controller.onDrawWrokable(this.canvasSet);
+            }
+            this.debug.onDrawWrokable(this.canvasSet);
         }
         // console.log('draw')
     }
 
+
+    getTargetEventObjects() {
+        const objects: WorldObj[] = [];
+        objects.push(this.controller, this.me);
+        // z값에 따라서 order by 해야될듯?
+        this.objectManager.objects.forEach(it => objects.push(it));
+        objects.push(this.space);
+        return objects;
+    }
+
+    private click(e: MouseEvent) {
+        if (e.target) {
+            const boundingClientRect = (e.target as HTMLCanvasElement).getBoundingClientRect();
+            const pointVector = new PointVector(e.clientX - boundingClientRect.left, e.clientY - boundingClientRect.top);
+            for (let targetEventObject of this.getTargetEventObjects()) {
+                if (targetEventObject.click(pointVector, e)) {
+                    break;
+                }
+            }
+        }
+    }
+
+    private mouseDown(e: MouseEvent | TouchEvent) {
+        if (e.target) {
+            const boundingClientRect = (e.target as HTMLCanvasElement).getBoundingClientRect();
+            const pointVector = new PointVector();
+            if (e instanceof MouseEvent) {
+                pointVector.x = e.clientX - boundingClientRect.left;
+                pointVector.y = e.clientY - boundingClientRect.top;
+            } else {
+                pointVector.x = e.touches[0].clientX - boundingClientRect.left;
+                pointVector.y = e.touches[0].clientY - boundingClientRect.top;
+            }
+            for (let targetEventObject of this.getTargetEventObjects()) {
+                if (targetEventObject.mouseDown(pointVector, e)) {
+                    break;
+                }
+            }
+        }
+    }
+
+    private mouseUp(e: MouseEvent | TouchEvent) {
+        if (e.target) {
+            const boundingClientRect = (e.target as HTMLCanvasElement).getBoundingClientRect();
+            const pointVector = new PointVector();
+            if (e instanceof MouseEvent) {
+                pointVector.x = e.clientX - boundingClientRect.left;
+                pointVector.y = e.clientY - boundingClientRect.top;
+            } else {
+                pointVector.x = e.touches[0].clientX - boundingClientRect.left;
+                pointVector.y = e.touches[0].clientY - boundingClientRect.top;
+            }
+            for (let targetEventObject of this.getTargetEventObjects()) {
+                if (targetEventObject.mouseUp(pointVector, e)) {
+                    break;
+                }
+            }
+        }
+    }
+
+    private keyDown(e: KeyboardEvent) {
+        for (let targetEventObject of this.getTargetEventObjects()) {
+            if (targetEventObject.keyDown(e)) {
+                break;
+            }
+        }
+    }
+
+    private keyUp(e: KeyboardEvent) {
+        for (let targetEventObject of this.getTargetEventObjects()) {
+            if (targetEventObject.keyUp(e)) {
+                break;
+            }
+        }
+    }
 }
 
 const simpleBootFront = new SimpleBootFront(Index, new SimFrontOption(window));
-simpleBootFront.domRendoerExcludeProxy.push(CanvasRenderingContext2D, Subject)
+(simpleBootFront.domRendoerExcludeProxy as any[]).push(CanvasRenderingContext2D, ObjectsManager, ResourceManager, WorldManager, Me, Space, Subject);
 simpleBootFront.run();

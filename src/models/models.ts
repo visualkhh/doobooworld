@@ -1,4 +1,4 @@
-export type WorldObjDataType = 'ptdb' | 'wow'
+export type WorldObjDataType = 'ptdb' | 'stick'
 export type PositionData = {
     x: number,
     y: number
@@ -10,6 +10,7 @@ export type VolumeData = {
 
 export type WorldObjData = {
     type: WorldObjDataType,
+    img: string,
     frame: number,
     pbf: number,
     position: PositionData,

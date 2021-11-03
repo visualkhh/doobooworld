@@ -3,10 +3,14 @@ import { WorldObj } from 'objects/base/WorldObj';
 
 export class Debug extends WorldObj {
 
-    onProcess(): void {
+    animationFrame(timestamp: number): void {
     }
 
-    onDraws(canvasSet: CanvasSet): void {
+    isWorkable(): boolean {
+        return true;
+    }
+
+    onDraw(canvasSet: CanvasSet): void {
         const center = canvasSet.getCenter();
         const context = canvasSet.context;
         context.lineWidth = 1;

@@ -17,6 +17,81 @@
         "w": 1,
         "h": 1
       }
+    },
+    {
+      "type": "stick",
+      "img": "assets/images/stick/kenney_medievalrtspack/Tile/medievalTile_58.png",
+      "frame": 3,
+      "pbf": 0,
+      "position": {"x": 4, "y": 4},
+      "volume": { "w": 1,"h": 1
+      }
+    },
+    {
+      "type": "stick",
+      "img": "assets/images/stick/kenney_medievalrtspack/Tile/medievalTile_57.png",
+      "frame": 3,
+      "pbf": 0,
+      "position": {"x": 4, "y": 4},
+      "volume": { "w": 1,"h": 1
+      }
+    },
+    {
+      "type": "stick",
+      "img": "assets/images/stick/kenney_medievalrtspack/Tile/medievalTile_57.png",
+      "frame": 3,
+      "pbf": 0,
+      "position": {"x": 4, "y": 5},
+      "volume": { "w": 1,"h": 1}
+    },
+    {
+      "type": "stick",
+      "img": "assets/images/stick/kenney_medievalrtspack/Tile/medievalTile_57.png",
+      "frame": 3,
+      "pbf": 0,
+      "position": {"x": 4, "y": 6},
+      "volume": { "w": 1,"h": 1}
+    },
+    {
+      "type": "stick",
+      "img": "assets/images/stick/kenney_medievalrtspack/Tile/medievalTile_58.png",
+      "frame": 3,
+      "pbf": 0,
+      "position": {"x": 5, "y": 6},
+      "volume": { "w": 1,"h": 1}
+    },
+    {
+      "type": "stick",
+      "img": "assets/images/stick/kenney_medievalrtspack/Tile/medievalTile_52.png",
+      "frame": 3,
+      "pbf": 0,
+      "position": {"x": 6, "y": 6},
+      "volume": { "w": 1,"h": 1}
+    },
+    {
+      "type": "stick",
+      "img": "assets/images/stick/kenney_medievalrtspack/Tile/medievalTile_50.png",
+      "frame": 3, "pbf": 0, "position": {"x": 5, "y": 5}, "volume": { "w": 1,"h": 1}
+    },
+    {
+      "type": "stick",
+      "img": "assets/images/stick/kenney_medievalrtspack/Tile/medievalTile_48.png",
+      "frame": 3, "pbf": 0, "position": {"x": 6, "y": 5}, "volume": { "w": 1,"h": 1}
+    },
+    {
+      "type": "stick",
+      "img": "assets/images/stick/kenney_medievalrtspack/Tile/medievalTile_34.png",
+      "frame": 3, "pbf": 0, "position": {"x": 5, "y": 4}, "volume": { "w": 1,"h": 1}
+    },
+    {
+      "type": "stick",
+      "img": "assets/images/stick/kenney_medievalrtspack/Tile/medievalTile_35.png",
+      "frame": 3, "pbf": 0, "position": {"x": 5, "y": 3}, "volume": { "w": 1,"h": 1}
+    },
+    {
+      "type": "stick",
+      "img": "assets/images/stick/kenney_medievalrtspack/Tile/medievalTile_46.png",
+      "frame": 3, "pbf": 0, "position": {"x": 6, "y": 4}, "volume": { "w": 1,"h": 1}
     }
   ],
   "use": true
